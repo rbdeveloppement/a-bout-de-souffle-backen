@@ -1,0 +1,51 @@
+security:
+  enable_authenticator_manager: true
+  providers:
+    users:
+      entity:
+        # the class of the entity that represents users
+        class: 'App\Entity\Users'
+        # the property to query by - e.g. email, username, etc
+        property: "email"
+  password_hashers:
+    # auto hasher with default options for the User class (and children)
+    App\Entity\User: "auto"
+
+    # auto hasher with custom options for all PasswordAuthenticatedUserInterface instances
+    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+      algorithm: "auto"
+      cost: 15
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    # main:
+    #   anonymous: true
+    #   lazy: true
+    #   provider:
+    login:
+      pattern: ^/api/login
+      stateless: true
+      json_login:
+        check_path: /api/login_check
+        success_handler: lexik_jwt_authentication.handler.authentication_success
+        failure_handler: lexik_jwt_authentication.handler.authentication_failure
+    api:
+      pattern: ^/api
+      stateless: true
+      jwt: ~
+
+    # activate different ways to authenticate
+    # https://symfony.com/doc/current/security.html#the-firewall
+
+    # https://symfony.com/doc/current/security/impersonating_user.html
+    # switch_user: true
+
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  access_control:
+    - { path: ^/api/login, roles: PUBLIC_ACCESS }
+    - { path: ^/api/popular, roles: PUBLIC_ACCESS }
+    - { path: ^/api/product, roles: PUBLIC_ACCESS }
+    - { path: ^/api/address, roles: IS_AUTHENTICATED_FULLY }
+    # - { path: ^/api, roles: IS_AUTHENTICATED_FULLY, requires_channel: https }
